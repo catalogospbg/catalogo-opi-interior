@@ -214,6 +214,11 @@ html:has(#sheet:not([hidden])),html:has(#datos:not([hidden])){overflow:hidden}
 .seg button{font:inherit;font-size:14px;font-weight:500;line-height:1.2;min-height:54px;padding:10px 12px;border-radius:14px;border:1px solid #000;background:var(--ground);color:var(--ink);cursor:pointer}
 .seg button[aria-checked="true"]{background:#000;color:#fff}
 .alta.flash{animation:flash .5s 3}
+.envw{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:16px;border:1px solid var(--soft)}
+.envw .aq{font-size:14.5px;font-weight:600;margin:0}
+.envw .seg button{min-height:44px}
+.envt{font-size:13px;margin:0;line-height:1.4}
+.envt b{font-weight:600}
 @keyframes flash{50%{box-shadow:0 0 0 3px #b3124f}}
 .chk{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.35;cursor:pointer}
 .chk input{width:18px;height:18px;margin:0;flex:none;accent-color:#000}
@@ -352,6 +357,11 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
           </div>
           <p class="altaok" id="altaok" hidden></p>
         </div>
+        <div class="envw" id="envw" hidden>
+          <p class="aq" id="envq">Envío</p>
+          <div class="seg" id="envseg" role="radiogroup" aria-labelledby="envq" hidden></div>
+          <p class="envt" id="envt"></p>
+        </div>
         <label class="telw" id="telw" hidden>Enviar el pedido a <select id="tel" aria-label="Enviar el pedido a"></select></label>
         <div class="more">
           <button class="lnk" id="pdf" type="button">Descargar pedido en PDF</button>
@@ -383,11 +393,7 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
         <label class="f">Localidad<input type="text" name="localidad" autocomplete="address-level2" maxlength="60" required></label>
         <label class="f">Departamento<select name="depto" required><option value="">Elegí</option></select></label>
       </div>
-      <div class="dos">
-        <label class="f">Mail <small>(para la factura)</small><input type="email" name="mail" autocomplete="email" maxlength="80"></label>
-        <label class="f">Agencia de envío <small>(preferida)</small><input type="text" name="agencia" list="agencias" maxlength="60"></label>
-      </div>
-      <datalist id="agencias"><option value="DAC"><option value="UES"><option value="Agencia de ómnibus"></datalist>
+      <label class="f">Mail <small>(para la factura)</small><input type="email" name="mail" autocomplete="email" maxlength="80"></label>
       <div class="f" style="font-size:11.5px;font-weight:500;letter-spacing:.05em;text-transform:uppercase">Foto de tu cédula</div>
       <div class="fotos">
         <label class="foto" id="ffrente"><b>Frente</b><span>Tocá para sacar o elegir la foto</span><input type="file" accept="image/*" data-lado="frente"></label>
@@ -418,6 +424,9 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
   };
   var CFG=VAR[window.VARIANTE||(/\/interior(\/|$)/.test(location.pathname)?'interior':'montevideo')];
   var MINIMO=CFG.minimo, OUTLET=-2, TONO={0:1,1:1,2:1,3:1,4:1}, TELS=[{nombre:'',tel:CFG.tel}], OUTLET_ON=true, OCULTOS={};
+  // Envío (data/config.json → envio): opciones, comentario y costo (se muestra solo si es mayor a 0).
+  var ENV={op:[],nota:'',costo:0}, ENVSEL='';
+  try{ ENVSEL=localStorage.getItem('opi-envio')||'' }catch(e){}
   try{S.sel=JSON.parse(localStorage.getItem('opi-qty')||'{}')||{}}catch(e){S.sel={}}
   try{S.gift=JSON.parse(localStorage.getItem('opi-gift')||'{}')||{}}catch(e){S.gift={}}
   var phone=CFG.tel, PUB=false;
@@ -436,6 +445,9 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
     if(+c.minimo>0) MINIMO=+c.minimo;
     if(c.bajoMinimo==='publico'||c.bajoMinimo==='bloquea') CFG.bajoMinimo=c.bajoMinimo;
     if(c.outlet===false) OUTLET_ON=false;
+    var e=c.envio||{};
+    ENV.op=(e.opciones||[]).map(function(x){return String(x||'').trim()}).filter(Boolean);
+    ENV.nota=String(e.nota||'').trim(); ENV.costo=+e.costo>0?Math.round(+e.costo):0;
     ((aj&&aj.ocultos)||[]).forEach(function(k){ OCULTOS[k]=1 });
     var h=(location.hash||'').replace(/[^0-9]/g,''), pref=null; try{ pref=localStorage.getItem('opi-tel') }catch(e){}
     phone=h||(TELS.some(function(t){return t.tel===pref})?pref:TELS[0].tel);
@@ -450,7 +462,7 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
   if(PUB){ $('hmin').innerHTML='Desde <b>'+money(MINIMO)+'</b> a precio profesional, tu pedido va a <b>precio profesional</b>. Si no llegás, se envía igual a precio consumidor final.';
     $('omin').innerHTML='Desde '+money(MINIMO)+', precio profesional.' }
   Array.prototype.forEach.call(document.querySelectorAll('.minv'),function(e){ e.textContent=money(MINIMO) });
-  $('ann').textContent=(PUB?'Envíos a todo el país · Desde '+money(MINIMO)+', precio profesional':'Pedido mínimo '+money(MINIMO)+' · Pedidos por WhatsApp')+(OUTLET_ON?' · Outlet 1+1':'');
+  $('ann').textContent=(PUB?'Envíos'+(ENV.op.length===1?' por '+ENV.op[0]:'')+' a todo el país · Desde '+money(MINIMO)+', precio profesional':'Pedido mínimo '+money(MINIMO)+' · Pedidos por WhatsApp')+(OUTLET_ON?' · Outlet 1+1':'');
   }
   if(CFG.video.indexOf('img/outlet.mp4')<0) $('ohelpv').src=CFG.video;
   var TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
@@ -645,6 +657,18 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
     return '<div class="sug"><div class="gsec">'+esc(tit)+'</div><p class="hint">Base, top y tratamientos del sistema que llevás'+(t.falta>0?', y los tonos que más se piden':'')+'.</p>'+
       '<div class="rowcards mini">'+L.map(cardHtml).join('')+'</div></div>';
   }
+  function envSel(){ return ENV.op.indexOf(ENVSEL)>=0?ENVSEL:(ENV.op.length===1?ENV.op[0]:'') }
+  function envTexto(){ var e=envSel(); return (e?'Envío por '+e:'')+(ENV.costo?(e?' · costo ':'Costo de envío ')+money(ENV.costo):'') }
+  function envPaint(){
+    var w=$('envw'); w.hidden=!ENV.op.length&&!ENV.nota&&!ENV.costo; if(w.hidden) return;
+    var seg=$('envseg'), e=envSel();
+    seg.hidden=ENV.op.length<2;
+    if(!seg.hidden) seg.innerHTML=ENV.op.map(function(o){ return '<button type="button" role="radio" aria-checked="'+(o===e)+'" data-env="'+esc(o)+'">'+esc(o)+'</button>' }).join('');
+    var multi=ENV.op.length>1;
+    $('envq').textContent=multi?'¿Por dónde te lo enviamos?':envTexto()||'Envío';
+    var t=[]; if(multi&&ENV.costo) t.push('<b>Costo de envío '+money(ENV.costo)+'</b>'); if(ENV.nota) t.push(esc(ENV.nota));
+    $('envt').innerHTML=t.join('<br>'); $('envt').hidden=!t.length;
+  }
   function chosen(){ return ITEMS.filter(function(it){return S.sel[it.key]>0}) }
   function gifts(){ return ITEMS.filter(function(it){return S.gift[it.key]>0}) }
   function message(){
@@ -661,10 +685,11 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
     var link=orderLink(C); 
     out.push(''); var gu=0; G.forEach(function(it){ gu+=S.gift[it.key] });
     out.push('Total: '+units+(units===1?' unidad':' unidades')+(gu?' + '+gu+(gu===1?' obsequio':' obsequios'):'')+(tot&&all?' · '+money(tot)+' con impuestos ('+lista(t)+')':''));
+    if(envTexto()||ENV.nota){ out.push(''); if(envTexto()) out.push(envTexto()+'.'); if(ENV.nota) out.push(ENV.nota) }
     if(link){ out.push(''); out.push('Ver pedido con fotos: '+link) }
     if(ALTA.url&&A.tipo==='nueva'&&altaCompleta()){ var d=A.d; out.push(''); out.push('Primera compra · datos para el alta:');
       out.push('- '+d.nombre+(d.salon?' · '+d.salon:'')); out.push('- Cédula '+fmtCi(d.cedula)+(d.rut?' · RUT '+d.rut:''));
-      out.push('- '+d.direccion+', '+d.localidad+' ('+d.depto+')'); if(d.mail) out.push('- '+d.mail); if(d.agencia) out.push('- Envío por '+d.agencia);
+      out.push('- '+d.direccion+', '+d.localidad+' ('+d.depto+')'); if(d.mail) out.push('- '+d.mail);
       out.push('- Foto de cédula: '+(A.fotos.frente&&A.fotos.dorso?'enviada':'la mando por este chat')) }
     else if(ALTA.url&&A.tipo==='clienta'){ out.push(''); out.push('Ya soy clienta.') }
     if(REF){ out.push(''); out.push('Ref. '+REF) }
@@ -698,10 +723,11 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
     var falta=t.falta;
     $('barn').innerHTML=t.units+(t.units===1?' unidad':' unidades')+' en '+t.C.length+(t.C.length===1?' producto':' productos')+(t.gu?' + '+t.gu+(t.gu===1?' regalo':' regalos'):'')+'<span>'+(t.tot?money(t.tot)+' con impuestos'+(t.pub?' · precio consumidor final':(falta>0?' · mínimo '+money(MINIMO):'')):'Armá el pedido y envialo')+'</span>';
     var wa=$('wa'), why='';
-    BLOQ=(falta>0&&!PUB)?'min':(ALTA.url&&!A.tipo)?'tipo':(ALTA.url&&A.tipo==='nueva'&&!altaCompleta())?'datos':'';
+    BLOQ=(falta>0&&!PUB)?'min':(ALTA.url&&!A.tipo)?'tipo':(ALTA.url&&A.tipo==='nueva'&&!altaCompleta())?'datos':(ENV.op.length>1&&!envSel())?'envio':'';
     if(BLOQ==='min') why='Pedido mínimo '+money(MINIMO)+' a precio profesional: te faltan '+money(falta)+'.';
     if(BLOQ==='tipo') why='Para seguir, contanos arriba si ya sos clienta.';
     if(BLOQ==='datos') why='Para seguir, completá tus datos para el alta.';
+    if(BLOQ==='envio') why='Para seguir, elegí por dónde te lo enviamos.';
     $('wnote').hidden=!why; $('wnote').textContent=why;
     if(BLOQ){ wa.removeAttribute('href'); wa.setAttribute('aria-disabled','true') }
     else { wa.href='https://wa.me/'+phone+'?text='+encodeURIComponent(message()); wa.removeAttribute('aria-disabled') }
@@ -734,6 +760,7 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
     $('minw').textContent=falta<=0?'':(PUB?'Tu pedido va a precio consumidor final. Sumá '+money(falta)+' (a precio profesional) y pasa a precio profesional.':'Pedido mínimo '+money(MINIMO)+' a precio profesional: te faltan '+money(falta)+' para enviarlo.');
     $('totn').innerHTML=t.units+(t.units===1?' unidad':' unidades')+' <small>'+(t.all?'impuestos incluidos':'hay productos sin precio')+(PUB?' · '+lista(t):'')+'</small>';
     $('tot').textContent=t.tot?money(t.tot):'';
+    envPaint();
   }
   function change(k,d){
     var n=Math.max(0,Math.min(99,(S.sel[k]||0)+d));
@@ -799,12 +826,14 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
         doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(31,122,77); doc.text('OBSEQUIOS OUTLET 1+1 · SIN CARGO',M,y+6); y+=9;
         t.G.forEach(function(it){ row(it,S.gift[it.key],true) });
       }
-      if(y+16>285){ doc.addPage(); page++; head() }
+      if(y+26>285){ doc.addPage(); page++; head() }
       doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(29,21,34);
       doc.text('Total: '+t.units+(t.units===1?' unidad':' unidades')+(t.gu?' + '+t.gu+(t.gu===1?' obsequio':' obsequios'):''),M,y+9);
       if(t.tot) doc.text(money(t.tot),W-M,y+9,{align:'right'});
       doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(111,100,117);
       doc.text(t.all?(t.pub?'Precio consumidor final':'Precio profesional')+' con impuestos incluidos. Sujeto a disponibilidad al confirmar.':'Hay productos sin precio cargado. Sujeto a disponibilidad al confirmar.',M,y+15);
+      var envl=[envTexto()+(envTexto()?'.':''),ENV.nota].filter(Boolean).join(' ');
+      if(envl) doc.text(doc.splitTextToSize(envl,W-2*M),M,y+20);
       return {blob:doc.output('blob'),name:'pedido-opi-'+fecha.split('/').reverse().join('')+'.pdf'};
     });
   }
@@ -844,6 +873,8 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
   });
   $('items').addEventListener('click',onQty);
   $('ginfo').addEventListener('click',onQty);
+  $('envseg').addEventListener('click',function(ev){ var b=ev.target.closest('[data-env]'); if(!b) return;
+    ENVSEL=b.getAttribute('data-env'); try{ localStorage.setItem('opi-envio',ENVSEL) }catch(e){} envPaint(); bar() });
   $('tel').addEventListener('change',function(){ phone=this.value; try{ localStorage.setItem('opi-tel',phone) }catch(e){} bar() });
   $('obox').addEventListener('click',function(ev){ if(ev.target.closest('#ovb')){ vidOpen('ohelp','ohelpv','osnd',false); return } var b=ev.target.closest('[data-osys]'); if(!b) return; S.osys=+b.getAttribute('data-osys'); buildCols(); render() });
   $('wa').addEventListener('click',function(ev){
@@ -920,14 +951,14 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
   }
   function datosOpen(){
     var f=$('dform'), d=A.d||{};
-    ['salon','nombre','cedula','rut','direccion','localidad','depto','mail','agencia'].forEach(function(k){ if(f.elements[k]) f.elements[k].value=d[k]||'' });
+    ['salon','nombre','cedula','rut','direccion','localidad','depto','mail'].forEach(function(k){ if(f.elements[k]) f.elements[k].value=d[k]||'' });
     f.elements.ok.checked=!!A.ok; $('ferr').hidden=true; fotoPaint('frente'); fotoPaint('dorso');
     $('datos').hidden=false;
   }
   function datosClose(){ $('datos').hidden=true }
   function datosGuardar(){
     var f=$('dform'), d={}, err='';
-    ['salon','nombre','cedula','rut','direccion','localidad','depto','mail','agencia'].forEach(function(k){ d[k]=String(f.elements[k].value||'').trim() });
+    ['salon','nombre','cedula','rut','direccion','localidad','depto','mail'].forEach(function(k){ d[k]=String(f.elements[k].value||'').trim() });
     if(!d.nombre) err='Falta tu nombre y apellido.';
     else if(!ciOk(d.cedula)) err='Revisá el número de cédula.';
     else if(!d.direccion||!d.localidad||!d.depto) err='Falta la dirección, la localidad o el departamento.';
@@ -968,7 +999,8 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
   function enviarAlta(){
     var t=totals(), firma=JSON.stringify([A.d,A.fotos]);
     if(A.sent===firma) return;                       // ya enviada con estos mismos datos
-    var cuerpo={tipo:'alta',ref:REF,datos:A.d,fotos:A.fotos,consentimiento:true,web:$('dform').elements.web.value,
+    var datos={}; Object.keys(A.d||{}).forEach(function(k){ datos[k]=A.d[k] }); datos.agencia=envSel();
+    var cuerpo={tipo:'alta',ref:REF,datos:datos,fotos:A.fotos,consentimiento:true,web:$('dform').elements.web.value,
       pedido:t.units+(t.units===1?' unidad':' unidades')+(t.tot?' · '+money(t.tot)+' ('+lista(t)+')':'')};
     try{ fetch(ALTA.url,{method:'POST',body:JSON.stringify(cuerpo),keepalive:true,mode:'no-cors'}) }catch(e){}
     A.sent=firma; altaSave();

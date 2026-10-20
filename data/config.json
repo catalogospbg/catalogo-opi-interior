@@ -7,5 +7,12 @@
   ],
   "minimo": 7500,
   "bajoMinimo": "publico",
-  "outlet": true
+  "outlet": true,
+  "envio": {
+    "opciones": [
+      "DAC"
+    ],
+    "nota": "El costo del envío es a cargo de quien compra.",
+    "costo": 0
+  }
 }

@@ -157,6 +157,26 @@ main{padding-block:0 140px;padding-inline:var(--gutter)}
 @media(max-width:520px){.promo{grid-column:1/-1;padding:20px}}
 .gsec{padding:14px 0 2px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
 .it.gi .sub{color:var(--mute)}
+/* Regalos: aviso, botón Cambiar y barra para elegir tonos dentro del pedido */
+.gnote{margin:2px 0 6px;font-size:13px;line-height:1.35;color:var(--ink)}
+.gnote b{font-weight:600}
+.gchg{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:11.5px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;padding:9px 16px;border-radius:999px;border:1px solid #000;background:#fff;color:#000;cursor:pointer;white-space:nowrap}
+.gchg[aria-expanded="true"]{background:#000;color:#fff}
+.gpend{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;justify-content:space-between;margin:10px 0 4px;padding:12px 14px;border:1px solid #000;border-radius:14px;font-size:13.5px;line-height:1.35}
+.gpend span{flex:1 1 180px}
+.gcap{display:block;font-size:10px;line-height:1.25;letter-spacing:.02em;color:var(--mute);margin-top:4px;text-align:center}
+.gpick{background:var(--soft);margin:0 -20px;padding:14px 20px 16px;border-bottom:1px solid var(--line);scroll-margin:70px}
+.gpick .gph{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.gpick .gph b{font-size:13px;font-weight:600;letter-spacing:.02em}
+.gpick .gph span{display:block;font-size:12px;color:var(--mute);font-weight:400;margin-top:2px}
+.gpick .x{width:32px;height:32px;font-size:20px;background:#fff;flex:none}
+.gstrip{display:grid;grid-auto-flow:column;grid-auto-columns:92px;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:6px;scrollbar-width:thin}
+.gopt{scroll-snap-align:start;display:flex;flex-direction:column;align-items:stretch;gap:4px;font:inherit;text-align:left;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px;cursor:pointer;color:var(--ink)}
+.gopt img{display:block;width:100%;height:96px;object-fit:contain;background:#fff}
+.gopt .n{font-size:11px;line-height:1.2;font-weight:500;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.4em}
+.gopt .c{font-size:10px;color:var(--mute);letter-spacing:.03em}
+.gopt i{font-style:normal;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:center;border-radius:999px;background:#000;color:#fff;padding:5px 0;margin-top:2px}
+.gopt:hover{border-color:#000}
 .telw{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;letter-spacing:.04em}
 .telw select{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 2px;border:0;border-bottom:1px solid #000;background:var(--ground);color:var(--ink)}
 .minw{font-size:13px;font-weight:600;color:#b3124f;margin:0}
@@ -314,7 +334,7 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
         <li>Abrí <b>Ver pedido</b>, abajo, para revisar todo lo que elegiste.</li>
         <li><b>Realizar pedido</b> abre WhatsApp con el detalle listo para enviar.</li>
         <li><b>Descargar pedido en PDF</b> guarda un resumen con fotos y cantidades.</li>
-        <li id="hout">En <b>Outlet 1+1</b>, por cada tono que comprás elegís uno de regalo del mismo sistema.</li>
+        <li id="hout">En <b>Outlet 1+1</b>, por cada tono que comprás te llevás uno de regalo del mismo sistema. Si comprás un tono del Outlet, el regalo del mismo tono se suma solo y lo podés cambiar desde tu pedido.</li>
         <li id="hmin">El pedido mínimo para enviarlo por WhatsApp es de <b class="minv">$ 4.500</b> a precio profesional.</li>
       </ol>
     </div></div>
@@ -327,12 +347,12 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="otitle">
     <div class="phead"><h2 id="otitle">🎁 Cómo funciona el Outlet 1+1</h2><button class="x" id="oclose" type="button" aria-label="Cerrar">×</button></div>
     <div class="helpbody"><div class="helpgrid">
-      <div class="helpvw"><video class="helpv" id="ohelpv" src="img/outlet-interior.mp4?v=3" poster="img/outlet.jpg?v=2" playsinline controls preload="none"></video><button class="snd" id="osnd" type="button" hidden>🔊 Activar sonido</button></div>
+      <div class="helpvw"><video class="helpv" id="ohelpv" src="img/outlet-interior.mp4?v=4" poster="img/outlet.jpg?v=3" playsinline controls preload="none"></video><button class="snd" id="osnd" type="button" hidden>🔊 Activar sonido</button></div>
       <ol>
         <li>Entrá a <b>🎁 Outlet 1+1</b>, en las líneas.</li>
         <li>Por cada tono que comprás, te llevás <b>uno de regalo del mismo sistema</b> (Gel Color con Gel Color, Nail Lacquer con Nail Lacquer).</li>
         <li><b>Agregá</b> los tonos que vas a comprar: del Outlet o de cualquier parte del catálogo.</li>
-        <li>Tocá <b>Elegir de regalo</b> en el tono que quieras: el mismo u otro distinto.</li>
+        <li>Si comprás un tono del Outlet, <b>te sumamos el mismo de regalo</b>. ¿Preferís otro? Tocá <b>Cambiar</b> en tu pedido. Para los demás tonos, tocá <b>Elegir de regalo</b>.</li>
         <li>Los regalos van aparte en tu pedido, <b>sin cargo</b>. <span id="omin">Pedido mínimo <span class="minv">$ 4.500</span>.</span></li>
       </ol>
     </div></div>
@@ -418,8 +438,8 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
   var S={line:-1,fam:-1,col:-1,osys:-1,q:'',sel:{},gift:{}}, T=[], META=null, DISP={}, PP={}, OUT={}, ITEMS=[], BYKEY={}, TOP=[], RANK=null;
   // Variantes de la carta: misma data, distinto teléfono y pedido mínimo según la ruta.
   var VAR={
-    montevideo:{tel:'59892775633', minimo:4500, bajoMinimo:'bloquea', sub:'Carta para profesionales', video:'img/outlet-interior.mp4?v=3'},
-    interior:{tel:'59898010236', minimo:7500, bajoMinimo:'publico', sub:'Carta para profesionales · Interior del país', video:'img/outlet-interior.mp4?v=3',
+    montevideo:{tel:'59892775633', minimo:4500, bajoMinimo:'bloquea', sub:'Carta para profesionales', video:'img/outlet-interior.mp4?v=4'},
+    interior:{tel:'59898010236', minimo:7500, bajoMinimo:'publico', sub:'Carta para profesionales · Interior del país', video:'img/outlet-interior.mp4?v=4',
       altas:'https://script.google.com/macros/s/AKfycbwqTjU7eDuemYJfoUo3qOEhClgRvgcT7nSuQV7e1vyiGYbiBP1ZDVohOA64uUgYwiZf/exec'}   // URL /exec del Apps Script de altas (cuenta info@pbgroup.com.uy); vacío = sin bloque de alta
   };
   var CFG=VAR[window.VARIANTE||(/\/interior(\/|$)/.test(location.pathname)?'interior':'montevideo')];
@@ -535,12 +555,16 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
   function giftHtml(it){
     if(!it.out) return '';
     var g=S.gift[it.key]||0;
-    if(g) return '<div class="qty g"><button type="button" data-g="-1" aria-label="Quitar un regalo">−</button><output>'+g+'</output><button type="button" data-g="1" aria-label="Sumar un regalo">+</button></div>';
+    if(g) return '<div class="qty g"><button type="button" data-g="-1" aria-label="Quitar un regalo">−</button><output>'+g+'</output><button type="button" data-g="1" aria-label="Sumar un regalo">+</button></div><span class="gcap">De regalo · podés cambiarlo en tu pedido</span>';
     return '<button class="gadd'+(free(it.line)>0?'':' off')+'" type="button" data-g="1">🎁 Elegir de regalo</button>';
   }
   function credits(){ var c={}; Object.keys(S.sel).forEach(function(k){ var it=BYKEY[k]; if(it&&TONO[it.line]) c[it.line]=(c[it.line]||0)+S.sel[k] }); return c }
   function used(){ var u={}; Object.keys(S.gift).forEach(function(k){ var it=BYKEY[k]; if(it) u[it.line]=(u[it.line]||0)+S.gift[k] }); return u }
   function free(l){ return (credits()[l]||0)-(used()[l]||0) }
+  // Unidades de Outlet que quedan para regalo de un tono (si el tono existe solo como Outlet, lo comprado también sale de ahí).
+  function room(it){ return it.out-(S.gift[it.key]||0)-(it.soloOut?(S.sel[it.key]||0):0) }
+  // Barra para elegir regalos dentro del pedido: {modo:'cambiar', de:clave} o {modo:'elegir', line:n}
+  var PICK=null;
   function outLines(){ var o={}; ITEMS.forEach(function(it){ if(it.out) o[it.line]=(o[it.line]||0)+1 }); return o }
   function trimGifts(quiet){
     var c=credits(), u=used(), cut=false;
@@ -566,7 +590,8 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
       '<ul><li>Comprás un GelColor → elegís un GelColor del Outlet. Comprás un Nail Lacquer → elegís un Nail Lacquer. Los sistemas no se cruzan.</li>'+
       '<li>Sirve cualquier tono que compres, esté o no en el Outlet. Los tonos del Outlet también se pueden comprar.</li>'+
       '<li>El regalo puede ser el mismo tono que comprás (1+1) o uno distinto.</li>'+
-      '<li>Tocá <b>Elegir de regalo</b> en el tono que quieras. Los regalos van aparte en tu pedido, sin cargo. Hasta agotar stock.</li></ul>'+
+      '<li>Si comprás un tono del Outlet, <b>el regalo del mismo tono se suma solo</b>. Si preferís otro, cambialo desde tu pedido.</li>'+
+      '<li>Por los demás tonos que comprás, tocá <b>Elegir de regalo</b> en el tono que quieras. Los regalos van aparte en tu pedido, sin cargo. Hasta agotar stock.</li></ul>'+
       '<div class="osys" role="group" aria-label="Sistema">'+sys+'</div>'+
       '<p class="cred">'+(cr.length?'Regalos — '+cr.join(' · '):'Todavía no tenés regalos para elegir. <span>Agregá tonos a tu pedido y volvé acá.</span>')+'</p>';
     b.hidden=false;
@@ -743,19 +768,26 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
          '<div class="row2"><div class="qty"><button type="button" data-d="-1" aria-label="Quitar uno">−</button><output>'+n+'</output><button type="button" data-d="1" aria-label="Agregar uno">+</button></div>'+
          '<button class="rm" type="button" data-d="-99">'+TRASH+'Eliminar</button></div></div>';
     });
-    if(t.G.length){ h+='<div class="gsec">🎁 Obsequios Outlet 1+1 · sin cargo</div>';
-      t.G.forEach(function(it){ var g=S.gift[it.key];
+    if(PICK&&(PICK.modo==='cambiar'?!S.gift[PICK.de]:free(PICK.line)<=0)) PICK=null;
+    var ps=document.querySelector('#gpick .gstrip'), psl=ps?ps.scrollLeft:0, pmode=PICK&&(PICK.modo+(PICK.de||PICK.line));
+    var c=credits(), u=used(), ol=outLines(), pend=[], pl=[];
+    Object.keys(ol).forEach(function(l){ var f=(c[l]||0)-(u[l]||0); if(f>0){ pend.push(f+' de '+META.lines[l]); pl.push(+l) } });
+    if(t.G.length||pend.length){ h+='<div class="gsec">🎁 Tus regalos Outlet 1+1 · sin cargo</div>';
+      if(t.G.length) h+='<p class="gnote">Por cada tono del Outlet que comprás, <b>te sumamos el mismo de regalo</b>. ¿Querés otro tono? Tocá <b>Cambiar</b> y elegilo acá mismo.</p>';
+      t.G.forEach(function(it){ var g=S.gift[it.key], ab=!!(PICK&&PICK.modo==='cambiar'&&PICK.de===it.key);
         h+='<div class="it gi" data-key="'+esc(it.key)+'"><img class="th" alt="" width="44" height="76" src="img/p/'+encodeURIComponent(it.key)+'.jpg?v=9">'+
            '<div class="t"><b>'+esc(it.name)+'</b><span>'+esc(it.code||META.lines[it.line])+(it.gci?' · Cód. '+it.gci:'')+' · '+esc(META.lines[it.line])+'</span></div>'+
            '<div class="sub">Obsequio</div>'+
            '<div class="row2"><div class="qty g"><button type="button" data-g="-1" aria-label="Quitar un regalo">−</button><output>'+g+'</output><button type="button" data-g="1" aria-label="Sumar un regalo">+</button></div>'+
-           '<button class="rm" type="button" data-g="-99">'+TRASH+'Eliminar</button></div></div>' }) }
+           '<button class="gchg" type="button" data-chg="1" aria-expanded="'+ab+'">'+(ab?'Cerrar':'Cambiar')+'</button></div></div>';
+        if(ab) h+=pickHtml() });
+      if(pend.length) h+='<div class="gpend"><span>Te '+(pend.length===1&&pend[0].indexOf('1 ')===0?'queda':'quedan')+' para elegir de regalo: <b>'+esc(pend.join(', '))+'</b>.</span>'+
+        pl.map(function(l){ var ab=!!(PICK&&PICK.modo==='elegir'&&PICK.line===l); return '<button class="gchg" type="button" data-pl="'+l+'" aria-expanded="'+ab+'">'+(pl.length>1?'Elegir '+esc(META.lines[l]):'Elegir regalo')+'</button>' }).join('')+'</div>';
+      if(PICK&&PICK.modo==='elegir') h+=pickHtml() }
     h+=sugHtml(t);
     $('items').innerHTML=h;
-    var c=credits(), u=used(), ol=outLines(), pend=[];
-    Object.keys(ol).forEach(function(l){ var f=(c[l]||0)-(u[l]||0); if(f>0) pend.push(f+' de '+META.lines[l]) });
-    $('ginfo').hidden=!pend.length;
-    $('ginfo').innerHTML=pend.length?'<span>🎁 Te '+(pend.length===1&&pend[0].indexOf('1 ')===0?'queda':'quedan')+' para elegir en el Outlet: '+esc(pend.join(', '))+'.</span><button type="button" id="goout">Elegir regalos</button>':'';
+    if(PICK&&pmode===PICK.modo+(PICK.de||PICK.line)){ var ns=document.querySelector('#gpick .gstrip'); if(ns) ns.scrollLeft=psl }
+    $('ginfo').hidden=true;
     var falta=t.falta; $('minw').hidden=falta<=0;
     $('minw').textContent=falta<=0?'':(PUB?'Tu pedido va a precio consumidor final. Sumá '+money(falta)+' (a precio profesional) y pasa a precio profesional.':'Pedido mínimo '+money(MINIMO)+' a precio profesional: te faltan '+money(falta)+' para enviarlo.');
     $('totn').innerHTML=t.units+(t.units===1?' unidad':' unidades')+' <small>'+(t.all?'impuestos incluidos':'hay productos sin precio')+(PUB?' · '+lista(t):'')+'</small>';
@@ -763,10 +795,17 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
     envPaint();
   }
   function change(k,d){
-    var n=Math.max(0,Math.min(99,(S.sel[k]||0)+d));
+    var prev=S.sel[k]||0, n=Math.max(0,Math.min(99,prev+d)), it=BYKEY[k], auto=0;
     if(n) S.sel[k]=n; else delete S.sel[k];
+    if(it&&it.out&&TONO[it.line]){
+      // Outlet 1+1: comprar un tono del Outlet suma solo el mismo tono de regalo (se puede cambiar en el pedido).
+      for(var i=prev;i<n;i++){ if(free(it.line)>0&&room(it)>0){ S.gift[k]=(S.gift[k]||0)+1; auto++ } }
+      // Al bajar la cantidad, el primer regalo que se devuelve es el del mismo tono.
+      if(n<prev&&S.gift[k]){ var ov=(used()[it.line]||0)-(credits()[it.line]||0); if(ov>0){ var r=Math.min(ov,S.gift[k]); S.gift[k]-=r; if(!S.gift[k]) delete S.gift[k] } }
+    }
     save();
-    var it=BYKEY[k];
+    if(auto) toast('🎁 Te sumamos '+(auto>1?auto+' de regalo del mismo tono':'el mismo tono de regalo')+'. Si preferís otro, cambialo en tu pedido.',3800);
+    else if(it&&it.out&&TONO[it.line]&&n>prev&&free(it.line)>0) toast('🎁 Tenés un regalo para elegir. Elegilo en tu pedido.',3800);
     Array.prototype.forEach.call(document.querySelectorAll('main .card[data-key="'+k.replace(/"/g,'')+'"]'),function(card){
       card.classList.toggle('on',n>0||!!S.gift[k]); card.querySelector('.ctl').innerHTML=qtyHtml(it) });
     if(trimGifts(false)) render(); else refreshGifts();
@@ -785,6 +824,37 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
     } else g=Math.max(0,g+d);
     if(g) S.gift[k]=g; else delete S.gift[k];
     save(); refreshGifts(); bar();
+  }
+  // Barra de tonos del Outlet para elegir o cambiar un regalo sin salir del pedido.
+  function pickHtml(){
+    var cam=PICK.modo==='cambiar', de=cam?BYKEY[PICK.de]:null, l=cam?de.line:PICK.line, f=free(l);
+    var L=ITEMS.filter(function(it){ return it.out&&it.line===l&&(!de||it.key!==de.key)&&room(it)>0 })
+      .sort(function(a,b){ return (a.fam-b.fam)||a.name.localeCompare(b.name) });
+    var sub=META.lines[l]+' del Outlet · '+(cam?'reemplaza a '+de.name:'te '+(f===1?'queda 1':'quedan '+f)+' por elegir');
+    return '<div class="gpick" id="gpick"><div class="gph"><div><b>'+(cam?'Elegí otro tono de regalo':'Elegí tu regalo')+'</b><span>'+esc(sub)+'</span></div>'+
+      '<button class="x" type="button" data-pclose="1" aria-label="Cerrar">×</button></div>'+
+      (L.length?'<div class="gstrip">'+L.map(function(it){ return '<button class="gopt" type="button" data-pk="'+esc(it.key)+'" aria-label="Elegir '+esc(it.name)+' de regalo">'+
+        '<img loading="lazy" alt="" width="80" height="96" src="img/p/'+encodeURIComponent(it.key)+'.jpg?v=9"><span class="n">'+esc(it.name)+'</span><span class="c">'+esc(it.code||'')+'</span><i>Elegir</i></button>' }).join('')+'</div>'
+        :'<p class="hint">No quedan otros tonos del Outlet para regalo en '+esc(META.lines[l])+'.</p>')+'</div>';
+  }
+  function pickShow(){ setTimeout(function(){ var p=$('gpick'); if(p) p.scrollIntoView({behavior:'smooth',block:'nearest'}) },30) }
+  function onPick(ev){
+    var c=ev.target.closest('[data-chg]');
+    if(c){ var k=c.closest('[data-key]').getAttribute('data-key'); PICK=(PICK&&PICK.modo==='cambiar'&&PICK.de===k)?null:{modo:'cambiar',de:k}; cart(); pickShow(); return true }
+    var pl=ev.target.closest('[data-pl]');
+    if(pl){ var ln=+pl.getAttribute('data-pl'); PICK=(PICK&&PICK.modo==='elegir'&&PICK.line===ln)?null:{modo:'elegir',line:ln}; cart(); pickShow(); return true }
+    if(ev.target.closest('[data-pclose]')){ PICK=null; cart(); return true }
+    var o=ev.target.closest('[data-pk]'); if(!o) return false;
+    var it=BYKEY[o.getAttribute('data-pk')]; if(!it||!PICK) return true;
+    if(PICK.modo==='cambiar'){
+      var de=PICK.de; if(S.gift[de]){ S.gift[de]--; if(!S.gift[de]) delete S.gift[de] }
+      S.gift[it.key]=(S.gift[it.key]||0)+1; PICK=null;
+      toast('🎁 Listo: tu regalo ahora es '+it.name,2600);
+    } else if(free(it.line)>0&&room(it)>0){
+      S.gift[it.key]=(S.gift[it.key]||0)+1; var f=free(it.line);
+      toast(f>0?'🎁 Sumaste '+it.name+'. Te '+(f===1?'queda 1':'quedan '+f)+' por elegir':'🎁 Sumaste '+it.name+' de regalo',2400);
+    }
+    save(); refreshGifts(); bar(); return true;
   }
   function loadImg(src){ return new Promise(function(ok,ko){ var im=new Image(); im.onload=function(){ok(im)}; im.onerror=ko; im.src=src }) }
   function buildPdf(){
@@ -852,9 +922,10 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
       }
     }).catch(function(){ done('No se pudo armar el PDF. Enviá el pedido como texto.') });
   }
-  function toast(t){ var e=$('toast'); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){e.hidden=true},1800) }
+  function toast(t,ms){ var e=$('toast'); e.textContent=t; e.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(function(){e.hidden=true},ms||1800) }
 
   function onQty(ev){
+    if(onPick(ev)) return;
     var gb=ev.target.closest('[data-g]');
     if(gb){ var gh=gb.closest('[data-key]'); if(gh) changeGift(gh.getAttribute('data-key'),+gb.getAttribute('data-g')); return }
     if(ev.target.closest('#goout')){ $('sheet').hidden=true; setLine(OUTLET); window.scrollTo(0,0); return }
@@ -888,8 +959,8 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
   $('open').addEventListener('click',function(){ $('sheet').hidden=false; cart() });
   $('cartb').addEventListener('click',function(){ if(chosen().length){ $('sheet').hidden=false; cart() } else toast('Tu pedido está vacío') });
   $('grid').addEventListener('click',function(ev){ if(ev.target.closest('#goout2')){ setLine(OUTLET); window.scrollTo({top:$('grid').getBoundingClientRect().top+window.scrollY-160,behavior:'smooth'}) } });
-  $('close').addEventListener('click',function(){ $('sheet').hidden=true });
-  $('sheet').addEventListener('click',function(ev){ if(ev.target===this) this.hidden=true });
+  $('close').addEventListener('click',function(){ $('sheet').hidden=true; PICK=null });
+  $('sheet').addEventListener('click',function(ev){ if(ev.target===this){ this.hidden=true; PICK=null } });
   $('pdf').addEventListener('click',sendPdf);
   $('lines').addEventListener('click',function(ev){
     var b=ev.target.closest('.chip'); if(!b) return;

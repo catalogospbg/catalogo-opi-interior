@@ -5,6 +5,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Catálogo OPI · Interior del país</title>
+<!-- build: subir este valor en cada cambio de la página; así las pestañas abiertas con la versión anterior se recargan solas. -->
+<meta name="build" content="2026-11-19.1">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="OPI">
+<link rel="apple-touch-icon" href="img/app-180.png">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..700&display=swap">
 <style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
@@ -267,6 +274,19 @@ html:has(#sheet:not([hidden])),html:has(#datos:not([hidden])){overflow:hidden}
 .bar .n span{display:block;font-weight:350;font-size:12px;color:#bdbab6}
 .btn.wa{background:#fff;color:#000}
 .btn.ghost{background:transparent;color:#fff;border-color:#fff}
+.instb{align-self:flex-start;margin-top:6px;font:inherit;font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:10px 16px;border-radius:999px;border:1px solid #000;background:transparent;color:#000;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.instb svg{width:15px;height:15px;flex:none}
+.inv{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:12;margin:0 auto;max-width:460px;background:#fff;color:#000;border:1px solid #000;border-radius:18px;box-shadow:0 14px 44px rgba(0,0,0,.3);padding:16px;display:grid;grid-template-columns:54px 1fr;gap:4px 14px;align-items:center}
+html:has(#bar:not([hidden])):not(:has(.sheet:not([hidden]))) .inv{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+@media (min-width:900px){.inv{left:auto;right:24px;margin:0;width:420px}}
+.inv img{width:54px;height:54px;border-radius:13px;border:1px solid var(--line);display:block}
+.inv h3{margin:0;font-family:var(--display);font-size:16.5px;font-weight:600;line-height:1.2;letter-spacing:-.005em}
+.inv p{margin:3px 0 0;font-size:13px;line-height:1.35;color:var(--mute)}
+.inv .ia{grid-column:1/-1;display:flex;gap:8px;margin-top:10px}
+.inv .ia .btn{flex:1;text-align:center;padding:12px 10px}
+.shr{display:inline-block;width:17px;height:17px;vertical-align:-3px;margin:0 2px}
+.upd{position:fixed;left:0;right:0;top:0;z-index:30;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;gap:10px 14px;flex-wrap:wrap;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;font-size:13px;text-align:center}
+.upd button{font:inherit;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:8px 16px;border-radius:999px;border:0;background:#fff;color:#000;cursor:pointer}
 .toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:#000;color:#fff;padding:10px 18px;border-radius:999px;font-size:12.5px;letter-spacing:.04em;z-index:20;max-width:calc(100% - 32px);text-align:center}
 html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 .list{width:100%;background:#1c1c1c;color:#fff;border:1px solid #555;padding:10px;font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;max-height:30vh;overflow:auto;user-select:all}
@@ -297,6 +317,7 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
     <h1>Productos disponibles</h1>
     <p class="hdesc">Elegí tus tonos, armá el pedido y envialo por WhatsApp. Precios profesional y de consumidor final, con impuestos incluidos.</p>
     <p class="hfecha" id="fecha"></p>
+    <button class="instb" id="instb" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="m7.5 11 4.5 4.5L16.5 11"/><path d="M5 19.5h14"/></svg><span id="instt">Instalar en el celular</span></button>
   </div>
   <div class="hpics" id="hpics" aria-hidden="true"></div>
 </section>
@@ -427,6 +448,26 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
       <p class="hint">Si la foto no sube, no pasa nada: el pedido sale igual y la mandás por WhatsApp.</p></div>
   </div>
 </div>
+<div class="sheet" id="inst" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="ititle">
+    <div class="phead"><h2 id="ititle">Instalar el catálogo</h2><button class="x" id="iclose" type="button" aria-label="Cerrar">×</button></div>
+    <div class="helpbody"><ol id="isteps">
+      <li>Tocá <b>Compartir</b> <svg class="shr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3.5"/><path d="m8 7 4-4 4 4"/><path d="M8 10.5H6.5v10h11v-10H16"/></svg>, el cuadrado con la flecha hacia arriba. Si no lo ves, tocá primero los tres puntos <b>···</b>.</li>
+      <li>Elegí <b>Agregar a inicio</b>.</li>
+      <li>Confirmá con <b>Agregar</b>. El catálogo queda como una app más en tu pantalla.</li>
+    </ol></div>
+    <div class="pfoot"><div class="acts"><button class="btn pri" id="iok" type="button">Entendido</button></div></div>
+  </div>
+</div>
+
+<div class="inv" id="inv" role="dialog" aria-labelledby="invt" hidden>
+  <img src="img/app-192.png" alt="" width="54" height="54">
+  <div><h3 id="invt">Tené el catálogo OPI en tu celular</h3><p id="invp">Entrás con un toque, sin buscar el link, y ves siempre el stock y los precios del día.</p></div>
+  <div class="ia"><button class="btn sec" id="invno" type="button">Ahora no</button><button class="btn pri" id="invsi" type="button">Instalar</button></div>
+</div>
+
+<div class="upd" id="upd" hidden><span>Hay una versión nueva del catálogo. Tu pedido queda guardado.</span><button id="updb" type="button">Actualizar</button></div>
+
 <div class="toast" id="toast" hidden></div>
 
 <script>window.VARIANTE='interior'</script>
@@ -1078,6 +1119,74 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
   }
   altaInit();
   window.__pdf=buildPdf;
+  // Versión: la página se compara con la publicada (meta build) y se recarga sola si quedó vieja: pestañas que
+  // quedaron abiertas o que el navegador restauró de su copia. Con un diálogo abierto, avisa en vez de recargar.
+  var BUILD=((document.querySelector('meta[name="build"]')||{}).content)||'', VT=0, VNEW='';
+  function ssGet(k){ try{ return sessionStorage.getItem(k) }catch(e){ return null } }
+  function ssSet(k,v){ try{ sessionStorage.setItem(k,v); return sessionStorage.getItem(k)===v }catch(e){ return false } }
+  function verGo(){
+    if(ssGet('opi-rl')!==VNEW){ ssSet('opi-rl',VNEW); location.reload(); return }
+    // La recarga volvió a traer la copia vieja: se pide con una dirección distinta, que no está en ninguna copia.
+    ssSet('opi-rl2',VNEW); var q=(location.search||'').replace(/([?&])_v=[^&]*&?/,'$1').replace(/[?&]$/,'');
+    location.replace(location.pathname+q+(q?'&':'?')+'_v='+encodeURIComponent(VNEW)+location.hash);
+  }
+  function verCheck(){
+    if(!BUILD||!window.fetch||Date.now()-VT<60000) return; VT=Date.now();
+    fetch(location.pathname+'?_='+VT,{cache:'no-store'}).then(function(r){ return r.ok?r.text():'' }).then(function(t){
+      var m=/<meta name=.build. content=.([^"']+)/.exec(t); if(!m||m[1]===BUILD) return;
+      VNEW=m[1]; if(ssGet('opi-rl2')===VNEW) return;                        // ya se intentó por las dos vías
+      if(!ssSet('opi-t','1')||document.querySelector('.sheet:not([hidden])')) $('upd').hidden=false; else verGo();
+    }).catch(function(){});
+  }
+  $('updb').addEventListener('click',function(){ this.disabled=true; verGo() });
+  window.addEventListener('pageshow',function(ev){ if(ev.persisted) verCheck() });
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) verCheck() });
+  verCheck();
+  // sw.js pide la página siempre a la red (sin copia del navegador) y permite instalarla como app.
+  if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('sw.js').catch(function(){}) }catch(e){} }
+
+  // Instalar como app, en celular o computadora: Chrome y Edge ofrecen la instalación; en iPhone y en Safari de Mac se explica el camino.
+  var DIP=null, UA=navigator.userAgent||'';
+  var APP=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+  var IOS=/iPhone|iPad|iPod/.test(UA)||(/Macintosh/.test(UA)&&navigator.maxTouchPoints>1);
+  var INAPP=/Instagram|FBAN|FBAV|FB_IAB|Line\/|TikTok|musical_ly/i.test(UA);   // navegadores internos: no permiten instalar
+  window.addEventListener('beforeinstallprompt',function(ev){ ev.preventDefault(); DIP=ev; if(!APP){ $('instb').hidden=false; invAuto() } });
+  window.addEventListener('appinstalled',function(){ DIP=null; $('instb').hidden=true; $('inv').hidden=true; toast('Listo: el catálogo quedó instalado',2600) });
+  var MOB=IOS||/Android|Mobi/i.test(UA), DONDE=MOB?'celular':'computadora';
+  var SAFMAC=!IOS&&/Macintosh/.test(UA)&&/Safari\//.test(UA)&&!/Chrom|Edg\/|OPR\/|Firefox/.test(UA)&&(+(/Version\/(\d+)/.exec(UA)||[0,0])[1])>=17;   // Safari 17 o más: Agregar al Dock
+  var GUIA=(IOS&&!INAPP)||SAFMAC;
+  $('instt').textContent='Instalar en '+(MOB?'el celular':'la computadora');
+  if(!MOB) $('invp').textContent='Lo abrís con un clic, como un programa más, y ves siempre el stock y los precios del día.';
+  if(SAFMAC){ $('ititle').textContent='Instalar en tu Mac';
+    $('isteps').innerHTML='<li>En la barra de menús de Safari, arriba, abrí <b>Archivo</b>.</li><li>Elegí <b>Agregar al Dock</b>.</li><li>Confirmá con <b>Agregar</b>. El catálogo queda en el Dock como una app más.</li>' }
+  else if(IOS) $('ititle').textContent='Instalar en tu iPhone';
+  function instClose(){ $('inst').hidden=true }
+  function instGo(){
+    if(DIP){ var p=DIP; DIP=null; $('instb').hidden=true; try{ p.prompt() }catch(e){} }
+    else $('inst').hidden=false;
+  }
+  $('instb').addEventListener('click',instGo);
+  // Invitación a instalar: aparece sola en dos momentos, al volver de enviar un pedido y desde la segunda visita.
+  // Si la cierran, no vuelve por 14 días, y como mucho se muestra 3 veces. El botón de la portada queda siempre.
+  var VIS=1, SENT=0, INVQ=0;
+  try{ VIS=+localStorage.getItem('opi-vis')||0; if(!ssGet('opi-vs')){ VIS++; localStorage.setItem('opi-vis',VIS); ssSet('opi-vs','1') } }catch(e){}
+  function invOk(){ var no=0,n=0; try{ no=+localStorage.getItem('opi-inst-no')||0; n=+localStorage.getItem('opi-inst-n')||0 }catch(e){}
+    return !APP&&(DIP||GUIA)&&n<3&&Date.now()-no>14*864e5 }
+  function invShow(post){
+    if(!invOk()||!$('inv').hidden) return;
+    if(!post&&document.querySelector('.sheet:not([hidden])')){ if(INVQ++<6) setTimeout(function(){ invShow(false) },5000); return }   // espera a que cierren la ayuda o el pedido
+    $('invt').textContent=post?'¿Ya enviaste tu pedido? Guardá el catálogo para el próximo':'Tené el catálogo OPI en tu '+DONDE;
+    $('inv').hidden=false;
+  }
+  function invClose(){ $('inv').hidden=true; try{ localStorage.setItem('opi-inst-no',Date.now()); localStorage.setItem('opi-inst-n',(+localStorage.getItem('opi-inst-n')||0)+1) }catch(e){} }
+  function invAuto(){ if(VIS>=2&&!invAuto.on){ invAuto.on=1; setTimeout(function(){ invShow(false) },4000) } }
+  $('invno').addEventListener('click',invClose);
+  $('invsi').addEventListener('click',function(){ invClose(); instGo() });
+  $('wa').addEventListener('click',function(){ if(this.getAttribute('href')) SENT=1 });
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden&&SENT){ SENT=0; setTimeout(function(){ invShow(true) },700) } });
+  if(GUIA&&!APP){ $('instb').hidden=false; invAuto() }
+  $('iclose').addEventListener('click',instClose); $('iok').addEventListener('click',instClose);
+  $('inst').addEventListener('click',function(ev){ if(ev.target===this) instClose() });
 })();
 </script>
 

@@ -1,0 +1,33 @@
+{
+ "name": "OPI · Catálogo Interior del país",
+ "short_name": "OPI",
+ "description": "Productos OPI disponibles para profesionales, con pedido por WhatsApp.",
+ "lang": "es",
+ "id": "./",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#ffffff",
+ "theme_color": "#000000",
+ "icons": [
+  {
+   "src": "img/app-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "img/app-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "img/app-mask-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}

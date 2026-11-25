@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Catálogo OPI · Interior del país</title>
 <!-- build: subir este valor en cada cambio de la página; así las pestañas abiertas con la versión anterior se recargan solas. -->
-<meta name="build" content="2026-11-25.1">
+<meta name="build" content="2026-11-25.2">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
@@ -426,7 +426,7 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
       <label class="f">Nombre del salón o comercio <small>(si tenés)</small><input type="text" name="salon" autocomplete="organization" maxlength="80"></label>
       <label class="f">Nombre y apellido<input type="text" name="nombre" autocomplete="name" maxlength="80" required></label>
       <div class="dos">
-        <label class="f">Cédula<input type="tel" name="cedula" inputmode="numeric" maxlength="11" placeholder="1.234.567-2" required></label>
+        <label class="f" id="fci">Cédula<input type="tel" name="cedula" inputmode="numeric" maxlength="11" placeholder="1.234.567-2" required></label>
         <label class="f">RUT <small>(si facturás con RUT)</small><input type="tel" name="rut" inputmode="numeric" maxlength="14"></label>
       </div>
       <label class="f">Celular <small>(lo pide DAC para coordinar la entrega)</small><input type="tel" name="celular" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="099 123 456" required></label>
@@ -437,17 +437,17 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
         <label class="f">Departamento<select name="depto" required><option value="">Elegí</option></select></label>
       </div>
       <label class="f">Mail <small>(para la factura)</small><input type="email" name="mail" autocomplete="email" maxlength="80"></label>
-      <div class="f" style="font-size:11.5px;font-weight:500;letter-spacing:.05em;text-transform:uppercase">Foto de tu cédula</div>
-      <div class="fotos">
+      <div class="f" id="fcit" style="font-size:11.5px;font-weight:500;letter-spacing:.05em;text-transform:uppercase">Foto de tu cédula</div>
+      <div class="fotos" id="fcif">
         <label class="foto" id="ffrente"><b>Frente</b><span>Tocá para sacar o elegir la foto</span><input type="file" accept="image/*" data-lado="frente"></label>
         <label class="foto" id="fdorso"><b>Dorso</b><span>Tocá para sacar o elegir la foto</span><input type="file" accept="image/*" data-lado="dorso"></label>
       </div>
       <label class="trampa" aria-hidden="true">Web<input type="text" name="web" tabindex="-1" autocomplete="off"></label>
-      <label class="chk"><input type="checkbox" name="ok" required> <span>Autorizo a Delarin S.A. a usar estos datos y la foto de mi cédula solo para darme de alta como clienta y facturar mis pedidos.</span></label>
+      <label class="chk"><input type="checkbox" name="ok" required> <span id="oktxt">Autorizo a Delarin S.A. a usar estos datos y la foto de mi cédula solo para darme de alta como clienta y facturar mis pedidos.</span></label>
       <p class="ferr" id="ferr" hidden></p>
     </form>
     <div class="pfoot"><div class="acts"><button class="btn pri" id="dok" type="button">Guardar datos</button></div>
-      <p class="hint">Si la foto no sube, no pasa nada: el pedido sale igual y la mandás por WhatsApp.</p></div>
+      <p class="hint" id="fcih">Si la foto no sube, no pasa nada: el pedido sale igual y la mandás por WhatsApp.</p></div>
   </div>
 </div>
 <div class="sheet" id="inst" hidden>
@@ -756,9 +756,9 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
     if(envTexto()||ENV.nota){ out.push(''); if(envTexto()) out.push(envTexto()+'.'); if(ENV.nota) out.push(ENV.nota) }
     if(link){ out.push(''); out.push('Ver pedido con fotos: '+link) }
     if(ALTA.url&&A.tipo==='nueva'&&altaCompleta()){ var d=A.d; out.push(''); out.push('Primera compra · datos para el alta:');
-      out.push('- '+d.nombre+(d.salon?' · '+d.salon:'')); out.push('- Cédula '+fmtCi(d.cedula)+(d.rut?' · RUT '+d.rut:''));
+      out.push('- '+d.nombre+(d.salon?' · '+d.salon:'')); if(pideCi()) out.push('- Cédula '+fmtCi(d.cedula)+(d.rut?' · RUT '+d.rut:'')); else if(d.rut) out.push('- RUT '+d.rut);
       out.push('- '+dirTxt(d)+', '+d.localidad+' ('+d.depto+')'); out.push('- Cel. '+d.celular); if(d.mail) out.push('- '+d.mail);
-      out.push('- Foto de cédula: '+(A.fotos.frente&&A.fotos.dorso?'enviada':'la mando por este chat')) }
+      if(pideCi()) out.push('- Foto de cédula: '+(A.fotos.frente&&A.fotos.dorso?'enviada':'la mando por este chat')) }
     else if(ALTA.url&&A.tipo==='clienta'){ out.push(''); out.push('Ya soy clienta.') }
     if(REF){ out.push(''); out.push('Ref. '+REF) }
     return out.join('\n');
@@ -784,7 +784,7 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
   }
   function lista(t){ return t.pub?'precio consumidor final':'precio profesional' }
   function bar(){
-    var t=totals(); $('bar').hidden=t.C.length===0;
+    var t=totals(); $('bar').hidden=t.C.length===0; if(ALTA.url) altaPaint();
     $('cartn').hidden=!t.units; $('cartn').textContent=t.units;
     if(S.line===OUTLET) obox();
     if(!t.C.length){ $('sheet').hidden=true; return }
@@ -794,7 +794,7 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
     BLOQ=(falta>0&&!PUB)?'min':(ALTA.url&&!A.tipo)?'tipo':(ALTA.url&&A.tipo==='nueva'&&!altaCompleta())?'datos':(ENV.op.length>1&&!envSel())?'envio':'';
     if(BLOQ==='min') why='Pedido mínimo '+money(MINIMO)+' a precio profesional: te faltan '+money(falta)+'.';
     if(BLOQ==='tipo') why='Para seguir, contanos arriba si ya sos clienta.';
-    if(BLOQ==='datos') why='Para seguir, completá tus datos para el alta.';
+    if(BLOQ==='datos') why=(A.ok&&A.d&&A.d.nombre&&celOk(A.d.celular)&&!ciOk(A.d.cedula))?'Tu pedido va a precio profesional: para seguir, sumá tu cédula en tus datos.':'Para seguir, completá tus datos para el alta.';
     if(BLOQ==='envio') why='Para seguir, elegí por dónde te lo enviamos.';
     $('wnote').hidden=!why; $('wnote').textContent=why;
     if(BLOQ){ wa.removeAttribute('href'); wa.setAttribute('aria-disabled','true') }
@@ -1056,19 +1056,22 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
     Array.prototype.forEach.call(document.querySelectorAll('.foto input'),function(inp){ inp.addEventListener('change',function(){ if(this.files&&this.files[0]) subirFoto(this.getAttribute('data-lado'),this.files[0]); this.value='' }) });
   }
   function altaSave(){ try{ localStorage.setItem('opi-alta',JSON.stringify(A)) }catch(e){} }
-  function altaCompleta(){ var d=A.d||{}; return !!(A.ok&&d.nombre&&ciOk(d.cedula)&&celOk(d.celular)&&d.direccion&&d.localidad&&d.depto) }
+  function altaCompleta(){ var d=A.d||{}; return !!(A.ok&&d.nombre&&(!pideCi()||ciOk(d.cedula))&&celOk(d.celular)&&d.direccion&&d.localidad&&d.depto) }
+  // La cédula (número y foto) se pide solo si el pedido va a precio profesional; a precio consumidor final no hace falta.
+  function pideCi(){ return !totals().pub }
   function celOk(v){ var c=String(v||'').replace(/\D/g,''); return c.length>=8&&c.length<=13 }
   function dirTxt(d){ var e=String(d.esquina||'').replace(/^(esq(uina)?\.?)\s+/i,''); return d.direccion+(e?(/^(entre|casi)\s/i.test(e)?' ':' esq. ')+e:'') }
   function altaPaint(){
     Array.prototype.forEach.call(document.querySelectorAll('#alta [data-tipo]'),function(b){ b.setAttribute('aria-checked',String(b.getAttribute('data-tipo')===A.tipo)) });
     var p=$('altaok'); p.hidden=A.tipo!=='nueva';
     if(A.tipo!=='nueva') return;
-    p.innerHTML=altaCompleta()?'<span>✓ Datos de '+esc(A.d.nombre)+(A.fotos.frente&&A.fotos.dorso?' · cédula recibida':' · falta la foto de la cédula')+'</span><button type="button">Editar</button>':'<span>'+(A.ok&&A.d&&A.d.nombre&&!celOk(A.d.celular)?'Nos falta tu celular para el envío.':'Necesitamos tus datos para darte de alta.')+'</span><button type="button">Completar datos</button>';
+    p.innerHTML=altaCompleta()?'<span>✓ Datos de '+esc(A.d.nombre)+(!pideCi()?'':A.fotos.frente&&A.fotos.dorso?' · cédula recibida':' · falta la foto de la cédula')+'</span><button type="button">Editar</button>':'<span>'+(A.ok&&A.d&&A.d.nombre&&!celOk(A.d.celular)?'Nos falta tu celular para el envío.':A.ok&&A.d&&A.d.nombre&&pideCi()&&!ciOk(A.d.cedula)?'Tu pedido va a precio profesional: nos falta tu cédula.':'Necesitamos tus datos para darte de alta.')+'</span><button type="button">Completar datos</button>';
   }
   function datosOpen(){
     var f=$('dform'), d=A.d||{};
     ['salon','nombre','cedula','rut','celular','direccion','esquina','localidad','depto','mail'].forEach(function(k){ if(f.elements[k]) f.elements[k].value=d[k]||'' });
-    f.elements.ok.checked=!!A.ok; $('ferr').hidden=true; fotoPaint('frente'); fotoPaint('dorso');
+    f.elements.ok.checked=!!A.ok; $('ferr').hidden=true; var ci=pideCi(); ['fci','fcit','fcif','fcih'].forEach(function(i){ $(i).hidden=!ci });
+    $('oktxt').textContent=ci?'Autorizo a Delarin S.A. a usar estos datos y la foto de mi cédula solo para darme de alta como clienta y facturar mis pedidos.':'Autorizo a Delarin S.A. a usar estos datos solo para registrar, facturar y enviar mis pedidos.'; fotoPaint('frente'); fotoPaint('dorso');
     $('datos').hidden=false;
   }
   function datosClose(){ $('datos').hidden=true }
@@ -1076,16 +1079,16 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
     var f=$('dform'), d={}, err='';
     ['salon','nombre','cedula','rut','celular','direccion','esquina','localidad','depto','mail'].forEach(function(k){ d[k]=String(f.elements[k].value||'').trim() });
     if(!d.nombre) err='Falta tu nombre y apellido.';
-    else if(!ciOk(d.cedula)) err='Revisá el número de cédula.';
+    else if(pideCi()&&!ciOk(d.cedula)) err='Revisá el número de cédula.';
     else if(!celOk(d.celular)) err='Revisá el celular: lo necesita DAC para la entrega.';
     else if(!d.direccion||!d.localidad||!d.depto) err='Falta la dirección, la localidad o el departamento.';
     else if(d.mail&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.mail)) err='Revisá el mail.';
     else if(!f.elements.ok.checked) err='Para darte de alta necesitamos tu autorización (la casilla de abajo).';
     if(f.elements.web.value) err='';
     if(err){ $('ferr').textContent=err; $('ferr').hidden=false; return }
-    d.cedula=d.cedula.replace(/\D/g,''); A.d=d; A.ok=true; A.tipo='nueva'; A.sent='';
+    d.cedula=ciOk(d.cedula)?d.cedula.replace(/\D/g,''):''; A.d=d; A.ok=true; A.tipo='nueva'; A.sent='';
     altaSave(); altaPaint(); bar(); datosClose();
-    toast(A.fotos.frente&&A.fotos.dorso?'Datos guardados':'Datos guardados. Si podés, sumá la foto de la cédula');
+    toast(!pideCi()||(A.fotos.frente&&A.fotos.dorso)?'Datos guardados':'Datos guardados. Si podés, sumá la foto de la cédula');
   }
   // Cédula uruguaya: 6 o 7 dígitos + dígito verificador (pesos 2 9 8 7 6 3 4).
   function ciOk(v){ var c=String(v||'').replace(/\D/g,''); if(c.length<7||c.length>8) return false; var b=('0'+c).slice(-8), s=0, w=[2,9,8,7,6,3,4];
@@ -1116,7 +1119,7 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
   function enviarAlta(){
     var t=totals(), firma=JSON.stringify([A.d,A.fotos]);
     if(A.sent===firma) return;                       // ya enviada con estos mismos datos
-    var datos={}; Object.keys(A.d||{}).forEach(function(k){ datos[k]=A.d[k] }); datos.agencia=envSel(); datos.direccion=dirTxt(A.d);
+    var datos={}; Object.keys(A.d||{}).forEach(function(k){ datos[k]=A.d[k] }); datos.agencia=envSel(); datos.direccion=dirTxt(A.d); if(!ciOk(datos.cedula)) datos.cedula='consumidor final';
     var cuerpo={tipo:'alta',ref:REF,datos:datos,fotos:A.fotos,consentimiento:true,web:$('dform').elements.web.value,
       pedido:t.units+(t.units===1?' unidad':' unidades')+(t.tot?' · '+money(t.tot)+' ('+lista(t)+')':'')};
     try{ fetch(ALTA.url,{method:'POST',body:JSON.stringify(cuerpo),keepalive:true,mode:'no-cors'}) }catch(e){}

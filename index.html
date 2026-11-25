@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Catálogo OPI · Interior del país</title>
 <!-- build: subir este valor en cada cambio de la página; así las pestañas abiertas con la versión anterior se recargan solas. -->
-<meta name="build" content="2026-11-19.1">
+<meta name="build" content="2026-11-25.1">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
@@ -429,7 +429,9 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
         <label class="f">Cédula<input type="tel" name="cedula" inputmode="numeric" maxlength="11" placeholder="1.234.567-2" required></label>
         <label class="f">RUT <small>(si facturás con RUT)</small><input type="tel" name="rut" inputmode="numeric" maxlength="14"></label>
       </div>
-      <label class="f">Dirección de entrega<input type="text" name="direccion" autocomplete="street-address" maxlength="120" required></label>
+      <label class="f">Celular <small>(lo pide DAC para coordinar la entrega)</small><input type="tel" name="celular" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="099 123 456" required></label>
+      <label class="f">Dirección de entrega<input type="text" name="direccion" autocomplete="street-address" maxlength="70" required></label>
+      <label class="f">Esquina <small>(o entre qué calles, si sabés)</small><input type="text" name="esquina" maxlength="45"></label>
       <div class="dos">
         <label class="f">Localidad<input type="text" name="localidad" autocomplete="address-level2" maxlength="60" required></label>
         <label class="f">Departamento<select name="depto" required><option value="">Elegí</option></select></label>
@@ -755,7 +757,7 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
     if(link){ out.push(''); out.push('Ver pedido con fotos: '+link) }
     if(ALTA.url&&A.tipo==='nueva'&&altaCompleta()){ var d=A.d; out.push(''); out.push('Primera compra · datos para el alta:');
       out.push('- '+d.nombre+(d.salon?' · '+d.salon:'')); out.push('- Cédula '+fmtCi(d.cedula)+(d.rut?' · RUT '+d.rut:''));
-      out.push('- '+d.direccion+', '+d.localidad+' ('+d.depto+')'); if(d.mail) out.push('- '+d.mail);
+      out.push('- '+dirTxt(d)+', '+d.localidad+' ('+d.depto+')'); out.push('- Cel. '+d.celular); if(d.mail) out.push('- '+d.mail);
       out.push('- Foto de cédula: '+(A.fotos.frente&&A.fotos.dorso?'enviada':'la mando por este chat')) }
     else if(ALTA.url&&A.tipo==='clienta'){ out.push(''); out.push('Ya soy clienta.') }
     if(REF){ out.push(''); out.push('Ref. '+REF) }
@@ -1054,25 +1056,28 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
     Array.prototype.forEach.call(document.querySelectorAll('.foto input'),function(inp){ inp.addEventListener('change',function(){ if(this.files&&this.files[0]) subirFoto(this.getAttribute('data-lado'),this.files[0]); this.value='' }) });
   }
   function altaSave(){ try{ localStorage.setItem('opi-alta',JSON.stringify(A)) }catch(e){} }
-  function altaCompleta(){ var d=A.d||{}; return !!(A.ok&&d.nombre&&ciOk(d.cedula)&&d.direccion&&d.localidad&&d.depto) }
+  function altaCompleta(){ var d=A.d||{}; return !!(A.ok&&d.nombre&&ciOk(d.cedula)&&celOk(d.celular)&&d.direccion&&d.localidad&&d.depto) }
+  function celOk(v){ var c=String(v||'').replace(/\D/g,''); return c.length>=8&&c.length<=13 }
+  function dirTxt(d){ var e=String(d.esquina||'').replace(/^(esq(uina)?\.?)\s+/i,''); return d.direccion+(e?(/^(entre|casi)\s/i.test(e)?' ':' esq. ')+e:'') }
   function altaPaint(){
     Array.prototype.forEach.call(document.querySelectorAll('#alta [data-tipo]'),function(b){ b.setAttribute('aria-checked',String(b.getAttribute('data-tipo')===A.tipo)) });
     var p=$('altaok'); p.hidden=A.tipo!=='nueva';
     if(A.tipo!=='nueva') return;
-    p.innerHTML=altaCompleta()?'<span>✓ Datos de '+esc(A.d.nombre)+(A.fotos.frente&&A.fotos.dorso?' · cédula recibida':' · falta la foto de la cédula')+'</span><button type="button">Editar</button>':'<span>Necesitamos tus datos para darte de alta.</span><button type="button">Completar datos</button>';
+    p.innerHTML=altaCompleta()?'<span>✓ Datos de '+esc(A.d.nombre)+(A.fotos.frente&&A.fotos.dorso?' · cédula recibida':' · falta la foto de la cédula')+'</span><button type="button">Editar</button>':'<span>'+(A.ok&&A.d&&A.d.nombre&&!celOk(A.d.celular)?'Nos falta tu celular para el envío.':'Necesitamos tus datos para darte de alta.')+'</span><button type="button">Completar datos</button>';
   }
   function datosOpen(){
     var f=$('dform'), d=A.d||{};
-    ['salon','nombre','cedula','rut','direccion','localidad','depto','mail'].forEach(function(k){ if(f.elements[k]) f.elements[k].value=d[k]||'' });
+    ['salon','nombre','cedula','rut','celular','direccion','esquina','localidad','depto','mail'].forEach(function(k){ if(f.elements[k]) f.elements[k].value=d[k]||'' });
     f.elements.ok.checked=!!A.ok; $('ferr').hidden=true; fotoPaint('frente'); fotoPaint('dorso');
     $('datos').hidden=false;
   }
   function datosClose(){ $('datos').hidden=true }
   function datosGuardar(){
     var f=$('dform'), d={}, err='';
-    ['salon','nombre','cedula','rut','direccion','localidad','depto','mail'].forEach(function(k){ d[k]=String(f.elements[k].value||'').trim() });
+    ['salon','nombre','cedula','rut','celular','direccion','esquina','localidad','depto','mail'].forEach(function(k){ d[k]=String(f.elements[k].value||'').trim() });
     if(!d.nombre) err='Falta tu nombre y apellido.';
     else if(!ciOk(d.cedula)) err='Revisá el número de cédula.';
+    else if(!celOk(d.celular)) err='Revisá el celular: lo necesita DAC para la entrega.';
     else if(!d.direccion||!d.localidad||!d.depto) err='Falta la dirección, la localidad o el departamento.';
     else if(d.mail&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.mail)) err='Revisá el mail.';
     else if(!f.elements.ok.checked) err='Para darte de alta necesitamos tu autorización (la casilla de abajo).';
@@ -1111,7 +1116,7 @@ html:has(#sheet:not([hidden])) .toast,html:has(#datos:not([hidden])) .toast{bott
   function enviarAlta(){
     var t=totals(), firma=JSON.stringify([A.d,A.fotos]);
     if(A.sent===firma) return;                       // ya enviada con estos mismos datos
-    var datos={}; Object.keys(A.d||{}).forEach(function(k){ datos[k]=A.d[k] }); datos.agencia=envSel();
+    var datos={}; Object.keys(A.d||{}).forEach(function(k){ datos[k]=A.d[k] }); datos.agencia=envSel(); datos.direccion=dirTxt(A.d);
     var cuerpo={tipo:'alta',ref:REF,datos:datos,fotos:A.fotos,consentimiento:true,web:$('dform').elements.web.value,
       pedido:t.units+(t.units===1?' unidad':' unidades')+(t.tot?' · '+money(t.tot)+' ('+lista(t)+')':'')};
     try{ fetch(ALTA.url,{method:'POST',body:JSON.stringify(cuerpo),keepalive:true,mode:'no-cors'}) }catch(e){}
